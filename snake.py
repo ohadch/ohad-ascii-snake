@@ -37,6 +37,14 @@ key_commands = {
     'd': 'right',
 }
 
+opposite_commands = {
+    'up': 'down',
+    'down': 'up',
+    'right': 'left',
+    'left': 'right',
+}
+
+
 # ---------------- Custom Functions ---------------
 
 
@@ -62,7 +70,8 @@ class Game(object):
         self.play = True
         self.result = ""
         self.score = "Score: {}".format(len(self.snake) - 2)
-
+        self.food_coordinates = ""
+        
     def add_borders(self):
         self.zone.append([-1 for x in xrange(self.size + 2)])
         self.zone.insert(0, [-1 for x in xrange(self.size + 2)])
@@ -95,22 +104,15 @@ class Game(object):
     def snake_move(self, eat):
         for spot in self.snake:
             self.clear_spot(spot)
-        if eat:
-            self.generate_food()
-        else:
+        if not eat:
             self.snake.pop(0)
 
         self.snake.append(self.next_spot())
         for spot in self.snake:
             self.draw_spot(spot, 1)
 
-    def snake_eat(self):
-        self.snake.append(self.next_spot())
-
-        for spot in self.snake:
-            self.zone[spot[0]][spot[1]] = 1
-
-        self.generate_food()
+        if eat:
+            self.generate_food()
 
     def generate_food(self):
         a = random.randint(2, self.size - 1)
@@ -118,6 +120,7 @@ class Game(object):
 
         if self.check_spot((a, b)) == 'free':
             self.zone[a][b] = 2
+            self.food_coordinates = "Y: {} X: {}".format(a, b)
         else:
             return self.generate_food()
 
@@ -141,13 +144,16 @@ class Game(object):
         self.generate_food()
         self.snake_move(False)
         while self.play:
-            timeout = 0.1
+            timeout = 0.3 / (len(self.snake) - 1.0)
             start_time = time.time()
             while True:
                 if msvcrt.kbhit():
                     inp = msvcrt.getch()
                     if inp in key_commands:
-                        self.next_move = key_commands[inp]
+                        if not key_commands[inp] == opposite_commands[self.next_move]:
+                            self.next_move = key_commands[inp]
+                        else:
+                            self.next_move = opposite_commands[key_commands[inp]]
                     break
                 elif time.time() - start_time > timeout:
                     break
@@ -155,8 +161,33 @@ class Game(object):
             self.score = "Score: {}".format(len(self.snake) - 2)
             print self.score
         print self.result
+    
+
+class Menu(object):
+
+    def __init__(self, board_size):
+        self.board_size  = board_size
+        self.game = Game(self.board_size)
+
+    def run(self):
+        self.game.loop()
+        self.ask_for_restart()
+
+    def ask_for_restart(self):
+        i = raw_input("Would you like to restart? Y/N: ")
+        if i.upper() == 'Y':
+            return self.restart()
+        elif i.upper == 'N':
+            print 'Thank you for playing! Ohad Chaet'
+            exit()
+        else:
+            print 'Answer must be either "Y" or "N".'
+
+    def restart(self):
+        self.game = Game(self.board_size)
+        self.run()
 
 # ------------------ Main ------------------
 
-# game = Game(20)
-# game.loop()
+menu = Menu(20)
+menu.run()
