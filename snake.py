@@ -1,11 +1,8 @@
 import os
 import msvcrt
 import time
-import threading
-import thread
-from threading import Timer
 import random
-
+from termcolor import colored
 
 # ----------------- Required Data -----------------
 
@@ -17,10 +14,10 @@ spot_types = {
 }
 
 spot_view = {
-    'border': '#',
+    'border': colored('#', 'red'),
     'free': " ",
-    'snake': "O",
-    'food': '&',
+    'snake': colored("O", 'cyan'),
+    'food': colored('&', 'yellow'),
 }
 
 moves = {
@@ -177,17 +174,20 @@ class Menu(object):
         i = raw_input("Would you like to restart? Y/N: ")
         if i.upper() == 'Y':
             return self.restart()
-        elif i.upper == 'N':
+        elif i.upper() == 'N':
             print 'Thank you for playing! Ohad Chaet'
             exit()
         else:
             print 'Answer must be either "Y" or "N".'
+            return self.ask_for_restart()
 
     def restart(self):
         self.game = Game(self.board_size)
         self.run()
 
+
 # ------------------ Main ------------------
+
 
 menu = Menu(20)
 menu.run()
