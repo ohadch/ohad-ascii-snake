@@ -14,9 +14,10 @@ spot_types = {
 }
 
 spot_view = {
-    'border': colored('#', 'red'),
+
+    'border': colored('#', 'magenta'),
     'free': " ",
-    'snake': colored("O", 'cyan'),
+    'snake': "X",
     'food': colored('&', 'yellow'),
 }
 
@@ -68,7 +69,9 @@ class Game(object):
         self.result = ""
         self.score = "Score: {}".format(len(self.snake) - 2)
         self.food_coordinates = ""
-        
+        self.rounds = 0
+        self.timeout = 0.3 / (len(self.snake) - 1.0)
+
     def add_borders(self):
         self.zone.append([-1 for x in xrange(self.size + 2)])
         self.zone.insert(0, [-1 for x in xrange(self.size + 2)])
@@ -127,6 +130,7 @@ class Game(object):
             print row_to_view(r)
 
     def exec_round(self):
+        self.rounds += 1
         if self.check_spot(self.next_spot()) == 'free':
             self.snake_move(False)
         elif self.check_spot(self.next_spot()) == 'eat':
@@ -141,7 +145,7 @@ class Game(object):
         self.generate_food()
         self.snake_move(False)
         while self.play:
-            timeout = 0.3 / (len(self.snake) - 1.0)
+            self.timeout = 0.3 / (len(self.snake) - 1.0)
             start_time = time.time()
             while True:
                 if msvcrt.kbhit():
@@ -152,7 +156,7 @@ class Game(object):
                         else:
                             self.next_move = opposite_commands[key_commands[inp]]
                     break
-                elif time.time() - start_time > timeout:
+                elif time.time() - start_time > self.timeout:
                     break
             self.exec_round()
             self.score = "Score: {}".format(len(self.snake) - 2)
@@ -189,5 +193,5 @@ class Menu(object):
 # ------------------ Main ------------------
 
 
-menu = Menu(20)
-menu.run()
+# menu = Menu(20)
+# menu.run()
