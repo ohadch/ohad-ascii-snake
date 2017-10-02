@@ -3,6 +3,7 @@ import msvcrt
 import time
 import random
 from termcolor import colored
+import json
 
 # ----------------- Required Data -----------------
 
@@ -71,6 +72,10 @@ class Game(object):
         self.food_coordinates = ""
         self.rounds = 0
         self.timeout = 0.3 / (len(self.snake) - 1.0)
+        self.food = {
+            'y': 0,
+            'x': 0,
+        }
 
     def add_borders(self):
         self.zone.append([-1 for x in xrange(self.size + 2)])
@@ -115,12 +120,13 @@ class Game(object):
             self.generate_food()
 
     def generate_food(self):
-        a = random.randint(2, self.size - 1)
-        b = random.randint(2, self.size - 1)
+        a = random.randint(1, self.size)
+        b = random.randint(1, self.size)
 
         if self.check_spot((a, b)) == 'free':
             self.zone[a][b] = 2
-            self.food_coordinates = "Y: {} X: {}".format(a, b)
+            self.food['y'] = a
+            self.food['x'] = b
         else:
             return self.generate_food()
 
@@ -138,6 +144,7 @@ class Game(object):
         elif self.check_spot(self.next_spot()) == 'crash':
             self.play = False
             self.result = "You lose!"
+        self.jsonify()
         self.show()
 
     def loop(self):
@@ -162,7 +169,12 @@ class Game(object):
             self.score = "Score: {}".format(len(self.snake) - 2)
             print self.score
         print self.result
-    
+
+    def jsonify(self):
+        f = open('log.txt', 'w')
+        f.write(json.dumps(self.__dict__))
+        f.close()
+
 
 class Menu(object):
 
@@ -190,8 +202,6 @@ class Menu(object):
         self.run()
 
 
-# ------------------ Main ------------------
-
-
-# menu = Menu(20)
-# menu.run()
+if __name__ == '__main__':
+    menu = Menu(20)
+    menu.run()
