@@ -28,10 +28,10 @@ MOVES: Dict[Direction, Tuple[int, int]] = {
 }
 
 KEY_COMMANDS: Dict[str, Direction] = {
-    'w': Direction.UP,
-    's': Direction.DOWN,
-    'a': Direction.LEFT,
-    'd': Direction.RIGHT,
+    'key.up': Direction.UP,
+    'key.down': Direction.DOWN,
+    'key.left': Direction.LEFT,
+    'key.right': Direction.RIGHT,
 }
 
 OPPOSITE_COMMANDS = {
