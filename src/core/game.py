@@ -2,7 +2,10 @@ import os
 import random
 import select
 import sys
+import threading
 import time
+
+from pynput.keyboard import Listener
 
 from src.enums import Direction
 from src.settings import MOVES, KEY_COMMANDS, OPPOSITE_COMMANDS
@@ -82,7 +85,7 @@ class Game:
             return self.generate_food()
 
     def show(self):
-        os.system('cls')
+        os.system('clear')
         for r in self.zone:
             print(row_to_view(r))
 
@@ -101,24 +104,29 @@ class Game:
         self.show()
         self.generate_food()
         self.snake_move(False)
-        while self.play:
-            self.timeout = 0.3 / (len(self.snake) - 1.0)
-            start_time = time.time()
-            while True:
-                # Check for keypress
-                if select.select([sys.stdin], [], [], 0)[0]:
-                    inp = getch()
-                    if inp in KEY_COMMANDS:
-                        if KEY_COMMANDS[inp] != OPPOSITE_COMMANDS.get(self.next_move, None):
-                            self.next_move = KEY_COMMANDS[inp]
-                        else:
-                            self.next_move = OPPOSITE_COMMANDS[KEY_COMMANDS[inp]]
-                    break
-                # Check for timeout
-                elif time.time() - start_time > self.timeout:
-                    break
 
-            self.exec_round()
-            self.score = "Score: {}".format(len(self.snake) - 2)
-            print(self.score)
+        def show(key):
+            key = str(key).replace('"', "").replace("'", "").lower()
+            if key in KEY_COMMANDS:
+                if KEY_COMMANDS[key] != OPPOSITE_COMMANDS.get(self.next_move, None):
+                    self.next_move = KEY_COMMANDS[key]
+                else:
+                    self.next_move = OPPOSITE_COMMANDS[KEY_COMMANDS[key]]
+
+        # Collect all event until released
+        with Listener(on_press=show) as listener:
+            # listener.join()
+            threading.Thread(target=listener.join).start()
+
+            while self.play:
+                self.timeout = 0.3 / (len(self.snake) - 1.0)
+                start_time = time.time()
+                while True:
+                    # Check for keypress
+                    if time.time() - start_time > self.timeout:
+                        break
+
+                self.exec_round()
+                self.score = "Score: {}".format(len(self.snake) - 2)
+                print(self.score)
         print(self.result)
