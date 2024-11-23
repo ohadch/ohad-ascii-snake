@@ -1,6 +1,8 @@
 # ASCII Snake Game
 
-This is an ASCII-based snake game that works best on Mac's native terminal.
+This ASCII-based snake game works best on Mac's native terminal.
+
+![Uploading Screen Recording 2024-11-23 at 8.33.08.gif…]()
 
 ## Installation
 1. Clone the repository:
