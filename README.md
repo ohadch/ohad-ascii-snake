@@ -2,7 +2,7 @@
 
 This ASCII-based snake game works best on Mac's native terminal.
 
-![Uploading Screen Recording 2024-11-23 at 8.33.08.gif…]()
+![Screen Recording 2024-11-23 at 8 33 08](https://github.com/user-attachments/assets/e559c2bd-cd00-426f-8dce-756759ff772b)
 
 ## Installation
 1. Clone the repository:
